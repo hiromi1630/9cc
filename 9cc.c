@@ -130,7 +130,7 @@ Token *tokenize(char *p)
       continue;
     }
 
-    error("トークナイズできません");
+    error_at(p, "トークナイズできません");
   }
 
   new_token(TK_EOF, cur, p);
