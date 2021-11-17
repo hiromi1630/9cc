@@ -10,6 +10,8 @@ typedef enum
 {
   ND_ADD, // +
   ND_SUB, // -
+  ND_MUL, // *
+  ND_DIV, // /
   ND_NUM, // 整数
 } NodeKind;
 
@@ -155,12 +157,11 @@ Token *tokenize(char *p)
       continue;
     }
 
-    if (*p == '+' || *p == '-')
+    if (*p == '+' || *p == '-' || *p == '*' || *p == '/')
     {
       cur = new_token(TK_RESERVED, cur, p++);
       continue;
     }
-
     if (isdigit(*p))
     {
       cur = new_token(TK_NUM, cur, p);
@@ -178,6 +179,26 @@ Token *tokenize(char *p)
 Node *primary()
 {
   return new_node_num(expect_number());
+}
+
+Node *mul()
+{
+  Node *node = primary();
+  for (;;)
+  {
+    if (consume('*'))
+    {
+      node = new_node(ND_MUL, node, primary());
+    }
+    else if (consume('/'))
+    {
+      node = new_node(ND_DIV, node, primary());
+    }
+    else
+    {
+      return node;
+    }
+  }
 }
 
 void gen(Node *node)
@@ -200,6 +221,14 @@ void gen(Node *node)
     break;
   case ND_SUB:
     printf("  sub rax, rdi\n");
+    break;
+  case ND_MUL:
+    printf("  imul rax, rdi\n");
+    break;
+  case ND_DIV:
+    printf("  cqo\n");
+    printf("  idiv rax, rdi\n");
+    break;
   }
 
   printf("push rax\n");
@@ -207,16 +236,16 @@ void gen(Node *node)
 
 Node *expr()
 {
-  Node *node = primary();
+  Node *node = mul();
   for (;;)
   {
     if (consume('+'))
     {
-      node = new_node(ND_ADD, node, primary());
+      node = new_node(ND_ADD, node, mul());
     }
     else if (consume('-'))
     {
-      node = new_node(ND_SUB, node, primary());
+      node = new_node(ND_SUB, node, mul());
     }
     else
     {
