@@ -178,6 +178,7 @@ Token *tokenize(char *p)
 
 Node *expr();
 Node *mul();
+Node *unary();
 Node *primary();
 
 Node *expr()
@@ -200,6 +201,22 @@ Node *expr()
   }
 }
 
+Node *unary()
+{
+  if (consume('+'))
+  {
+    return unary();
+  }
+  else if (consume('-'))
+  {
+    return new_node(ND_SUB, new_node_num(0), unary());
+  }
+  else
+  {
+    return primary();
+  }
+}
+
 Node *primary()
 {
   if (consume('('))
@@ -213,16 +230,16 @@ Node *primary()
 
 Node *mul()
 {
-  Node *node = primary();
+  Node *node = unary();
   for (;;)
   {
     if (consume('*'))
     {
-      node = new_node(ND_MUL, node, primary());
+      node = new_node(ND_MUL, node, unary());
     }
     else if (consume('/'))
     {
-      node = new_node(ND_DIV, node, primary());
+      node = new_node(ND_DIV, node, unary());
     }
     else
     {
