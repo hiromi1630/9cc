@@ -41,6 +41,17 @@ bool consume(char *op)
   return true;
 }
 
+Token *consume_ident()
+{
+  if (token->kind != TK_IDENT)
+  {
+    return NULL;
+  }
+  Token *tok = token;
+  token = token->next;
+  return tok;
+}
+
 // 次のトークンが期待している記号のときには、トークンを1つ読み進める。
 // それ以外の場合にはエラーを報告する。
 void expect(char *op)
@@ -84,8 +95,9 @@ bool startswith(char *p, char *q)
 }
 
 // 入力文字列pをトークナイズしてそれを返す
-Token *tokenize(char *p)
+void tokenize()
 {
+  char *p = user_input;
   Token head;
   head.next = NULL;
   Token *cur = &head;
@@ -105,11 +117,18 @@ Token *tokenize(char *p)
       p += 2;
       continue;
     }
-    if (strchr("+-*/()<>", *p))
+    if (strchr("+-*/()<>;=", *p))
     {
       cur = new_token(TK_RESERVED, cur, p++, 1);
       continue;
     }
+
+    if ('a' <= *p && *p <= 'z')
+    {
+      cur = new_token(TK_IDENT, cur, p++, 1);
+      continue;
+    }
+
     if (isdigit(*p))
     {
       cur = new_token(TK_NUM, cur, p, 0);
@@ -123,5 +142,5 @@ Token *tokenize(char *p)
   }
 
   new_token(TK_EOF, cur, p, 0);
-  return head.next;
+  token = head.next;
 }

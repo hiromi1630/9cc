@@ -16,6 +16,7 @@ typedef enum
 {
   TK_RESERVED, // 記号
   TK_NUM,      // 整数トークン
+  TK_IDENT,    // 識別子
   TK_EOF,      // 入力の終わりを表すトークン
 } TokenKind;
 
@@ -41,6 +42,7 @@ void error(char *fmt, ...);
 // 次のトークンが期待している記号のときには、トークンを1つ読み進めて
 // 真を返す。それ以外の場合には偽を返す。
 bool consume(char *op);
+Token *consume_ident();
 
 // 次のトークンが期待している記号のときには、トークンを1つ読み進める。
 // それ以外の場合にはエラーを報告する。
@@ -58,20 +60,22 @@ Token *new_token(TokenKind kind, Token *cur, char *str, int len);
 bool startswith(char *p, char *q);
 
 // 入力文字列pをトークナイズしてそれを返す
-Token *tokenize(char *p);
+void tokenize();
 
 //抽象構文木のノードの種類
 typedef enum
 {
-  ND_ADD, // +
-  ND_SUB, // -
-  ND_MUL, // *
-  ND_DIV, // /
-  ND_EQ,  // ==
-  ND_NE,  // !=
-  ND_LT,  // <
-  ND_LE,  // <=
-  ND_NUM, // 整数
+  ND_ADD,    // +
+  ND_SUB,    // -
+  ND_MUL,    // *
+  ND_DIV,    // /
+  ND_EQ,     // ==
+  ND_NE,     // !=
+  ND_LT,     // <
+  ND_LE,     // <=
+  ND_ASSIGN, // =
+  ND_LVAR,   // ローカル変数
+  ND_NUM,    // 整数
 } NodeKind;
 
 typedef struct Node Node;
@@ -83,15 +87,20 @@ struct Node
   Node *lhs;     // 左辺
   Node *rhs;     // 右辺
   int val;       // kindがND_NUMの場合のみ使う
+  int offset;    // kindがND_LVARの場合のみ使う
 };
 
+extern Node *code[];
 // ノードの作成
 Node *new_node(NodeKind kind, Node *lhs, Node *rhs);
 
 // ノードの作成(整数)
 Node *new_node_num(int val);
 
+void program();
+Node *stmt();
 Node *expr();
+Node *assign();
 Node *equality();
 Node *relational();
 Node *add();
@@ -99,4 +108,5 @@ Node *mul();
 Node *unary();
 Node *primary();
 
+void gen_lval(Node *node);
 void gen(Node *node);
