@@ -8,6 +8,7 @@ int main(int argc, char **argv)
   }
 
   // トークナイズする
+  LVar *locals = NULL;
   user_input = argv[1];
   tokenize();
   program();

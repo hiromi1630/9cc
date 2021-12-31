@@ -90,6 +90,22 @@ struct Node
   int offset;    // kindがND_LVARの場合のみ使う
 };
 
+typedef struct LVar LVar;
+
+// ローカル変数の型
+struct LVar
+{
+  LVar *next; // 次の変数かNULL
+  char *name; // 変数の名前
+  int len;    // 名前の長さ
+  int offset; // RBPからのオフセット
+};
+
+// ローカル変数
+extern LVar *locals;
+// 変数を名前で検索する
+LVar *find_lvar(Token *tok);
+
 extern Node *code[];
 // ノードの作成
 Node *new_node(NodeKind kind, Node *lhs, Node *rhs);
