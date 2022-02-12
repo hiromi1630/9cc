@@ -246,9 +246,9 @@ void gen(Node *node)
     gen(node->lhs);
     printf("  pop rax\n");
     printf("  cmp rax, 0\n");
-    printf("  je  .Lend000\n");
+    printf("  je  .Lend%d\n", lendCount);
     gen(node->rhs);
-    printf(".Lend000:\n");
+    printf(".Lend%d:\n", lendCount);
   case ND_NUM:
     printf("  push %d\n", node->val);
     return;
