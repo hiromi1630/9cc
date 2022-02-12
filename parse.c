@@ -63,6 +63,17 @@ Token *consume_return()
   return tok;
 }
 
+Token *consume_if()
+{
+  if (token->kind != TK_IF)
+  {
+    return NULL;
+  }
+  Token *tok = token;
+  token = token->next;
+  return tok;
+}
+
 // 次のトークンが期待している記号のときには、トークンを1つ読み進める。
 // それ以外の場合にはエラーを報告する。
 void expect(char *op)
@@ -126,7 +137,6 @@ void tokenize()
       p++;
       continue;
     }
-
     if (startswith(p, "==") || startswith(p, "!=") || startswith(p, ">=") || startswith(p, "<="))
     {
       cur = new_token(TK_RESERVED, cur, p, 2);
@@ -143,6 +153,13 @@ void tokenize()
     {
       cur = new_token(TK_RETURN, cur, p, 6);
       p += 6;
+      continue;
+    }
+
+    if (strncmp(p, "if", 2) == 0 && !is_alnum(p[2]))
+    {
+      cur = new_token(TK_IF, cur, p, 2);
+      p += 2;
       continue;
     }
 

@@ -18,6 +18,7 @@ typedef enum
   TK_NUM,      // 整数トークン
   TK_IDENT,    // 識別子
   TK_RETURN,   // return
+  TK_IF,       // if
   TK_EOF,      // 入力の終わりを表すトークン
 } TokenKind;
 
@@ -45,6 +46,7 @@ void error(char *fmt, ...);
 bool consume(char *op);
 Token *consume_ident();
 Token *consume_return();
+Token *consume_if();
 
 // 次のトークンが期待している記号のときには、トークンを1つ読み進める。
 // それ以外の場合にはエラーを報告する。
@@ -78,6 +80,7 @@ typedef enum
   ND_ASSIGN, // =
   ND_LVAR,   // ローカル変数
   ND_RETURN, // return
+  ND_IF,     // if
   ND_NUM,    // 整数
 } NodeKind;
 

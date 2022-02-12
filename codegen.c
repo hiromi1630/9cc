@@ -1,4 +1,6 @@
 #include "9cc.h"
+
+int lendCount = 0;
 // ノードの作成
 Node *new_node(NodeKind kind, Node *lhs, Node *rhs)
 {
@@ -33,7 +35,17 @@ void program()
 Node *stmt()
 {
   Node *node;
-  if (consume_return())
+  if (consume_if())
+  {
+    node = calloc(1, sizeof(Node));
+    node->kind = ND_IF;
+    consume("(");
+    node->lhs = expr();
+    consume(")");
+    node->rhs = stmt();
+    return node;
+  }
+  else if (consume_return())
   {
     node = calloc(1, sizeof(Node));
     node->kind = ND_RETURN;
@@ -230,6 +242,13 @@ void gen(Node *node)
     printf("  pop rbp\n");
     printf("  ret\n");
     return;
+  case ND_IF:
+    gen(node->lhs);
+    printf("  pop rax\n");
+    printf("  cmp rax, 0\n");
+    printf("  je  .Lend000\n");
+    gen(node->rhs);
+    printf(".Lend000:\n");
   case ND_NUM:
     printf("  push %d\n", node->val);
     return;

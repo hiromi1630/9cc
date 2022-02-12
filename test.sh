@@ -50,5 +50,11 @@ assert 5 'foo = 1;
 bar = 2 + 3;'
 assert 5 'return 5;
 return 8;'
+assert 2 'foo = 1;
+if(1) foo = 2;
+return foo;'
+assert 1 'foo = 1;
+if(foo == 2) foo = 2;
+return foo;'
 
 echo OK
