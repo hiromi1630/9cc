@@ -1,7 +1,6 @@
 #include "9cc.h"
 
-int lendCount = 0;
-int lelseCount = 0;
+int count = 0;
 // ノードの作成
 Node *new_node(NodeKind kind, Node *lhs, Node *rhs)
 {
@@ -55,6 +54,16 @@ Node *stmt()
     node = calloc(1, sizeof(Node));
     node->kind = ND_RETURN;
     node->lhs = expr();
+  }
+  else if (consume_while())
+  {
+    node = calloc(1, sizeof(Node));
+    node->kind = ND_WHILE;
+    consume("(");
+    node->lhs = expr();
+    consume(")");
+    node->rhs = stmt();
+    return node;
   }
   else
   {
@@ -253,25 +262,34 @@ void gen(Node *node)
       gen(node->lhs);
       printf("  pop rax\n");
       printf("  cmp rax, 0\n");
-      printf("  je  .Lend%d\n", lendCount);
+      printf("  je  .Lend%d\n", count);
       gen(node->rhs);
-      printf(".Lend%d:\n", lendCount);
-      lendCount++;
+      printf(".Lend%d:\n", count);
+      count++;
     }
     else
     {
       gen(node->lhs);
       printf("  pop rax\n");
       printf("  cmp rax, 0\n");
-      printf("  je .Lelse%d\n", lelseCount);
+      printf("  je .Lelse%d\n", count);
       gen(node->rhs);
-      printf("  jmp .Lend%d\n", lendCount);
-      printf(".Lelse%d:", lelseCount);
+      printf("  jmp .Lend%d\n", count);
+      printf(".Lelse%d:\n", count);
       gen(node->els);
-      printf(".Lend%d:", lendCount);
-      lendCount++;
-      lelseCount++;
+      printf(".Lend%d:\n", count);
+      count++;
     }
+    return;
+  case ND_WHILE:
+    printf(".Lbegin%d:\n", count);
+    gen(node->lhs);
+    printf("  pop rax\n");
+    printf("  cmp rax, 0\n");
+    printf("  je .Lend%d\n", count);
+    gen(node->rhs);
+    printf("  jmp .Lbegin%d\n", count);
+    printf(".Lend%d:\n", count);
     return;
   case ND_NUM:
     printf("  push %d\n", node->val);

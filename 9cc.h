@@ -20,6 +20,7 @@ typedef enum
   TK_RETURN,   // return
   TK_IF,       // if
   TK_ELSE,     // else
+  TK_WHILE,    // while
   TK_EOF,      // 入力の終わりを表すトークン
 } TokenKind;
 
@@ -49,6 +50,7 @@ Token *consume_ident();
 Token *consume_return();
 Token *consume_if();
 Token *consume_else();
+Token *consume_while();
 
 // 次のトークンが期待している記号のときには、トークンを1つ読み進める。
 // それ以外の場合にはエラーを報告する。
@@ -84,6 +86,7 @@ typedef enum
   ND_RETURN, // return
   ND_IF,     // if
   ND_ELSE,   // else
+  ND_WHILE,  // while
   ND_NUM,    // 整数
 } NodeKind;
 

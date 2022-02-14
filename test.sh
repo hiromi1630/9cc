@@ -57,5 +57,8 @@ assert 5 'foo = 1;
 if(foo == 2) foo = 2;
 else foo = 5;
 return foo;'
+assert 5 'foo = 1;
+while(foo < 5) foo = foo + 1;
+return foo;'
 
 echo OK
