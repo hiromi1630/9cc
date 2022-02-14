@@ -1,6 +1,7 @@
 #include "9cc.h"
 
 int lendCount = 0;
+int lelseCount = 0;
 // ノードの作成
 Node *new_node(NodeKind kind, Node *lhs, Node *rhs)
 {
@@ -43,6 +44,10 @@ Node *stmt()
     node->lhs = expr();
     consume(")");
     node->rhs = stmt();
+    if (consume_else())
+    {
+      node->els = stmt();
+    }
     return node;
   }
   else if (consume_return())
@@ -243,12 +248,31 @@ void gen(Node *node)
     printf("  ret\n");
     return;
   case ND_IF:
-    gen(node->lhs);
-    printf("  pop rax\n");
-    printf("  cmp rax, 0\n");
-    printf("  je  .Lend%d\n", lendCount);
-    gen(node->rhs);
-    printf(".Lend%d:\n", lendCount);
+    if (node->els == NULL)
+    {
+      gen(node->lhs);
+      printf("  pop rax\n");
+      printf("  cmp rax, 0\n");
+      printf("  je  .Lend%d\n", lendCount);
+      gen(node->rhs);
+      printf(".Lend%d:\n", lendCount);
+      lendCount++;
+    }
+    else
+    {
+      gen(node->lhs);
+      printf("  pop rax\n");
+      printf("  cmp rax, 0\n");
+      printf("  je .Lelse%d\n", lelseCount);
+      gen(node->rhs);
+      printf("  jmp .Lend%d\n", lendCount);
+      printf(".Lelse%d:", lelseCount);
+      gen(node->els);
+      printf(".Lend%d:", lendCount);
+      lendCount++;
+      lelseCount++;
+    }
+    return;
   case ND_NUM:
     printf("  push %d\n", node->val);
     return;

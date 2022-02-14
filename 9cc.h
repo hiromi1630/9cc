@@ -19,6 +19,7 @@ typedef enum
   TK_IDENT,    // 識別子
   TK_RETURN,   // return
   TK_IF,       // if
+  TK_ELSE,     // else
   TK_EOF,      // 入力の終わりを表すトークン
 } TokenKind;
 
@@ -47,6 +48,7 @@ bool consume(char *op);
 Token *consume_ident();
 Token *consume_return();
 Token *consume_if();
+Token *consume_else();
 
 // 次のトークンが期待している記号のときには、トークンを1つ読み進める。
 // それ以外の場合にはエラーを報告する。
@@ -81,6 +83,7 @@ typedef enum
   ND_LVAR,   // ローカル変数
   ND_RETURN, // return
   ND_IF,     // if
+  ND_ELSE,   // else
   ND_NUM,    // 整数
 } NodeKind;
 
@@ -92,6 +95,7 @@ struct Node
   NodeKind kind; // ノードの型
   Node *lhs;     // 左辺
   Node *rhs;     // 右辺
+  Node *els;     // only ND_ELSE
   int val;       // kindがND_NUMの場合のみ使う
   int offset;    // kindがND_LVARの場合のみ使う
 };

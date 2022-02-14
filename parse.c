@@ -74,6 +74,17 @@ Token *consume_if()
   return tok;
 }
 
+Token *consume_else()
+{
+  if (token->kind != TK_ELSE)
+  {
+    return NULL;
+  }
+  Token *tok = token;
+  token = token->next;
+  return tok;
+}
+
 // 次のトークンが期待している記号のときには、トークンを1つ読み進める。
 // それ以外の場合にはエラーを報告する。
 void expect(char *op)
@@ -160,6 +171,13 @@ void tokenize()
     {
       cur = new_token(TK_IF, cur, p, 2);
       p += 2;
+      continue;
+    }
+
+    if (strncmp(p, "else", 4) == 0 && !is_alnum(p[4]))
+    {
+      cur = new_token(TK_ELSE, cur, p, 4);
+      p += 4;
       continue;
     }
 
