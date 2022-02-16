@@ -65,6 +65,35 @@ Node *stmt()
     node->rhs = stmt();
     return node;
   }
+  else if (consume_token(TK_FOR))
+  {
+    node = calloc(1, sizeof(Node));
+    node->kind = ND_FOR;
+    Node *left = calloc(1, sizeof(Node));
+    left->kind = ND_FOR_LEFT;
+    Node *right = calloc(1, sizeof(Node));
+    right->kind = ND_FOR_RIGHT;
+    expect("(");
+    if (!consume(";"))
+    {
+      left->lhs = expr();
+      expect(";");
+    }
+    if (!consume(";"))
+    {
+      left->rhs = expr();
+      expect(";");
+    }
+    if (!consume(")"))
+    {
+      right->lhs = expr();
+      expect(")");
+    }
+    right->rhs = stmt();
+    node->lhs = left;
+    node->rhs = right;
+    return node;
+  }
   else
   {
     node = expr();
@@ -247,6 +276,12 @@ void gen_lval(Node *node)
 
 void gen(Node *node)
 {
+  count++;
+  int id = count;
+  if (!node)
+  {
+    return;
+  }
   switch (node->kind)
   {
   case ND_RETURN:
@@ -262,34 +297,44 @@ void gen(Node *node)
       gen(node->lhs);
       printf("  pop rax\n");
       printf("  cmp rax, 0\n");
-      printf("  je  .Lend%d\n", count);
+      printf("  je  .Lend%d\n", id);
       gen(node->rhs);
-      printf(".Lend%d:\n", count);
-      count++;
+      printf(".Lend%d:\n", id);
     }
     else
     {
       gen(node->lhs);
       printf("  pop rax\n");
       printf("  cmp rax, 0\n");
-      printf("  je .Lelse%d\n", count);
+      printf("  je .Lelse%d\n", id);
       gen(node->rhs);
-      printf("  jmp .Lend%d\n", count);
-      printf(".Lelse%d:\n", count);
+      printf("  jmp .Lend%d\n", id);
+      printf(".Lelse%d:\n", id);
       gen(node->els);
-      printf(".Lend%d:\n", count);
-      count++;
+      printf(".Lend%d:\n", id);
     }
     return;
   case ND_WHILE:
-    printf(".Lbegin%d:\n", count);
+    printf(".Lbegin%d:\n", id);
     gen(node->lhs);
     printf("  pop rax\n");
     printf("  cmp rax, 0\n");
-    printf("  je .Lend%d\n", count);
+    printf("  je .Lend%d\n", id);
     gen(node->rhs);
-    printf("  jmp .Lbegin%d\n", count);
-    printf(".Lend%d:\n", count);
+    printf("  jmp .Lbegin%d\n", id);
+    printf(".Lend%d:\n", id);
+    return;
+  case ND_FOR:
+    gen(node->lhs->lhs);
+    printf(".Lbegin%d:\n", id);
+    gen(node->lhs->rhs);
+    printf("  pop rax\n");
+    printf("  cmp rax, 0\n");
+    printf("  je  .Lend%d\n", id);
+    gen(node->rhs->rhs);
+    gen(node->rhs->lhs);
+    printf("  jmp .Lbegin%d\n", id);
+    printf("  .Lend%d:\n", id);
     return;
   case ND_NUM:
     printf("  push %d\n", node->val);

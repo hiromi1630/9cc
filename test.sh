@@ -60,5 +60,16 @@ return foo;'
 assert 5 'foo = 1;
 while(foo < 5) foo = foo + 1;
 return foo;'
+assert 4 'foo = 1;
+for(i=0;i<3;i=i+1) foo = foo + 1;
+return foo;'
+assert 10 'a = 0;
+for(;a<10;) a = a+1;
+return a;'
+
+assert 6 'a = 3;
+if(a > 1) if(a < 4) return 6;
+else return 5;
+'
 
 echo OK
