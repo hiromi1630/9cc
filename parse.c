@@ -41,53 +41,9 @@ bool consume(char *op)
   return true;
 }
 
-Token *consume_ident()
+Token *consume_token(TokenKind kind)
 {
-  if (token->kind != TK_IDENT)
-  {
-    return NULL;
-  }
-  Token *tok = token;
-  token = token->next;
-  return tok;
-}
-
-Token *consume_return()
-{
-  if (token->kind != TK_RETURN)
-  {
-    return NULL;
-  }
-  Token *tok = token;
-  token = token->next;
-  return tok;
-}
-
-Token *consume_if()
-{
-  if (token->kind != TK_IF)
-  {
-    return NULL;
-  }
-  Token *tok = token;
-  token = token->next;
-  return tok;
-}
-
-Token *consume_else()
-{
-  if (token->kind != TK_ELSE)
-  {
-    return NULL;
-  }
-  Token *tok = token;
-  token = token->next;
-  return tok;
-}
-
-Token *consume_while()
-{
-  if (token->kind != TK_WHILE)
+  if (token->kind != kind)
   {
     return NULL;
   }

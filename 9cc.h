@@ -46,11 +46,7 @@ void error(char *fmt, ...);
 // 次のトークンが期待している記号のときには、トークンを1つ読み進めて
 // 真を返す。それ以外の場合には偽を返す。
 bool consume(char *op);
-Token *consume_ident();
-Token *consume_return();
-Token *consume_if();
-Token *consume_else();
-Token *consume_while();
+Token *consume_token(TokenKind kind);
 
 // 次のトークンが期待している記号のときには、トークンを1つ読み進める。
 // それ以外の場合にはエラーを報告する。
