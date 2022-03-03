@@ -35,6 +35,18 @@ void program()
 Node *stmt()
 {
   Node *node;
+  if (consume("{"))
+  {
+    node = calloc(1, sizeof(Node));
+    node->kind = ND_BLOCK;
+    // TODO 100
+    node->block = calloc(100, sizeof(Node));
+    for (int i = 0; !consume("}"); i++)
+    {
+      node->block[i] = stmt();
+    }
+    return node;
+  }
   if (consume_token(TK_IF))
   {
     node = calloc(1, sizeof(Node));
@@ -284,6 +296,13 @@ void gen(Node *node)
   }
   switch (node->kind)
   {
+  case ND_BLOCK:
+    for (int i = 0; node->block[i]; i++)
+    {
+      gen(node->block[i]);
+      printf("  pop rax\n");
+    }
+    return;
   case ND_RETURN:
     gen(node->lhs);
     printf("  pop rax\n");
@@ -328,6 +347,10 @@ void gen(Node *node)
     gen(node->lhs->lhs);
     printf(".Lbegin%d:\n", id);
     gen(node->lhs->rhs);
+    if (!node->lhs->rhs)
+    {
+      printf("  push 1\n");
+    }
     printf("  pop rax\n");
     printf("  cmp rax, 0\n");
     printf("  je  .Lend%d\n", id);

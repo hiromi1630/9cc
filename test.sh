@@ -69,7 +69,13 @@ return a;'
 
 assert 6 'a = 3;
 if(a > 1) if(a < 4) return 6;
-else return 5;
-'
+else return 5;'
+
+assert 10 '
+a = 0;
+for(;;) {
+  a = a+1;
+  if(a == 5) return 10;
+}'
 
 echo OK

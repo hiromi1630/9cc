@@ -87,7 +87,8 @@ typedef enum
   ND_FOR,    // for
   ND_FOR_LEFT,
   ND_FOR_RIGHT,
-  ND_NUM, // 整数
+  ND_BLOCK, // block
+  ND_NUM,   // 整数
 } NodeKind;
 
 typedef struct Node Node;
@@ -99,6 +100,7 @@ struct Node
   Node *lhs;     // 左辺
   Node *rhs;     // 右辺
   Node *els;     // only ND_ELSE
+  Node **block;  // only ND_BLOCK
   int val;       // kindがND_NUMの場合のみ使う
   int offset;    // kindがND_LVARの場合のみ使う
 };
