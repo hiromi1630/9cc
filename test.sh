@@ -78,4 +78,5 @@ for(;;) {
   if(a == 5) return 10;
 }'
 
+assert 0 'foo();'
 echo OK

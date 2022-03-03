@@ -246,6 +246,16 @@ Node *primary()
   Token *tok = consume_token(TK_IDENT);
   if (tok)
   {
+    if (consume("("))
+    {
+      Node *node = calloc(1, sizeof(Node));
+      node->kind = ND_FUNC;
+      node->funcName = tok->str;
+      node->len = tok->len;
+      expect(")");
+      return node;
+    }
+
     Node *node = calloc(1, sizeof(Node));
     node->kind = ND_LVAR;
     LVar *lvar = find_lvar(tok);
@@ -275,6 +285,8 @@ Node *primary()
   return new_node_num(expect_number());
 }
 
+char name[100] = {0};
+
 void gen_lval(Node *node)
 {
   if (node->kind != ND_LVAR)
@@ -296,6 +308,10 @@ void gen(Node *node)
   }
   switch (node->kind)
   {
+  case ND_FUNC:
+    memcpy(name, node->funcName, node->len);
+    printf("  call %s\n", name);
+    return;
   case ND_BLOCK:
     for (int i = 0; node->block[i]; i++)
     {
